@@ -1,0 +1,11 @@
+[package]
+name = "projects-showcase-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rocket = { version = "0.5.1", features = ["secrets", "json"] }
+serde = { version = "1.0", features = ["derive"] }
+
+[default]
+port = 8080
