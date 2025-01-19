@@ -1,24 +1,18 @@
-#![feature(decl_macro)]
 #[macro_use] extern crate rocket;
 
-use rocket::serde::{Serialize, json::Json};
+use dotenvy::dotenv;
+use log::info;
+use env_logger;
 
-#[derive(Serialize)]
-struct Message {
-    status: u16,
-    message: String
-}
+mod api;
+mod db;
 
-#[get("/")]
-fn index() -> Json<Message> {
-   let message = Message {
-     status: 200,
-     message: String::from("Hello, API!"),
-   };
-   Json(message)
-}
+use api::index;
 
 #[launch]
 fn rocket() -> _ {
+    dotenv().ok();
+    env_logger::init();
     rocket::build().mount("/", routes![index])
 }
+
