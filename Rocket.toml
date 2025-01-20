@@ -1,0 +1,2 @@
+[default.databases]
+projects-showcase = { url = "@DATABASE_URL" }
