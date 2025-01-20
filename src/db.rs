@@ -2,17 +2,17 @@ use std::fs;
 use std::io::Error as IOError;
 use postgres::{Client, NoTls, Error as PgError};
 use dotenvy::dotenv;
-use std::{env};
+use std::env;
 use refinery::Error as RefineryError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum DatabaseError {
     #[error("Postgres error: {0}")]
-    PostgresError(#[from] PgError),  // ✅ Converts `postgres::Error`
+    PostgresError(#[from] PgError),
     
     #[error("Migration error: {0}")]
-    MigrationError(#[from] RefineryError),  // ✅ Converts `refinery::Error`
+    MigrationError(#[from] RefineryError),
 }
 
 mod embedded {
@@ -35,7 +35,7 @@ pub fn connect_db() -> Result<Client, PgError> {
     dotenv().ok();
     
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env");
-    let mut client = Client::connect(&database_url, NoTls)?;
+    let client = Client::connect(&database_url, NoTls)?;
     Ok(client)
 }
 

@@ -44,23 +44,6 @@ pub async fn index() -> Result<Json<Vec<Project>>, Status> {
                 Err(Status::InternalServerError)
             }
         }
-        
-
-        // match client.query_opt(&query, &[]) {
-        //     Ok(Some(row)) => Ok(Some(Project {
-        //         name: row.get("name"),
-        //         description: row.get("description"),
-        //         url: row.get("url"),
-        //     })),
-        //     Ok(None) => {
-        //         info!("No projects found in database.");
-        //         Ok(None)
-        //     }
-        //     Err(e) => {
-        //         error!("Database query failed: {}", e);
-        //         Err(Status::InternalServerError)
-        //     }
-        // }
     }).await;
 
     match result {
