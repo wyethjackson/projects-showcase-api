@@ -1,6 +1,6 @@
 use rocket::serde::{Serialize, json::Json};
 use rocket::http::Status;
-use crate::db::connect_db;
+use crate::db::{connect_db, load_query};
 use rocket::tokio::task;
 
 #[derive(Serialize)]
@@ -18,9 +18,15 @@ pub async fn index() -> Result<Json<Project>, Status> {
             Status::InternalServerError
         })?;
 
-        let query = "SELECT name, description, url FROM projects LIMIT 1";
+        let query = match load_query("src/sql/select-all-projects.sql") {
+            Ok(q) => q,
+            Err(e) => {
+                error!("Failed to load SQL query: {}", e);
+                return Err(Status::InternalServerError);
+            }
+        };
 
-        client.query_one(query, &[]).map(|row| Project {
+        client.query_one(&query, &[]).map(|row| Project {
             name: row.get("name"),
             description: row.get("description"),
             url: row.get("url"),
