@@ -11,7 +11,7 @@ pub struct Project {
 }
 
 #[get("/")]
-pub async fn index() -> Result<Json<Project>, Status> {
+pub async fn index() -> Result<Json<Vec<Project>>, Status> {
     let result = task::spawn_blocking(|| {
         let mut client = connect_db().map_err(|e| {
             error!("Database connection error: {}", e);
@@ -25,20 +25,30 @@ pub async fn index() -> Result<Json<Project>, Status> {
                 return Err(Status::InternalServerError);
             }
         };
-
-        client.query_one(&query, &[]).map(|row| Project {
-            name: row.get("name"),
-            description: row.get("description"),
-            url: row.get("url"),
-        }).map_err(|e| {
-            error!("Database query failed: {}", e);
-            Status::InternalServerError
-        })
+        match client.query(&query, &[]) {
+            Ok(rows) => {
+                if rows.is_empty() {
+                    info!("No projects found in database.");
+                    Ok(vec![])
+                } else {
+                    let projects: Vec<Project> = rows.iter().map(|row| Project {
+                        name: row.get("name"),
+                        description: row.get("description"),
+                        url: row.get("url"),
+                    }).collect();
+                    Ok(projects)
+                }
+            }
+            Err(e) => {
+                error!("Database query failed: {}", e);
+                Err(Status::InternalServerError)
+            }
+        }
     }).await;
 
     match result {
-        Ok(Ok(project)) => Ok(Json(project)),
-        Ok(Err(status)) => Err(status), 
+        Ok(Ok(projects)) => Ok(Json(projects)),
+        Ok(Err(status)) => Err(status),
         Err(e) => {
             error!("Thread panic: {}", e);
             Err(Status::InternalServerError)
