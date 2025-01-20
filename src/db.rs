@@ -1,9 +1,10 @@
-use tokio::fs;
-use postgres::{Client, NoTls, Error};
+use std::fs;
+use std::io::Error as IOError;
+use postgres::{Client, NoTls, Error as PgError};
 use dotenvy::dotenv;
 use std::env;
 
-pub fn connect_db() -> Result<Client, Error> {
+pub fn connect_db() -> Result<Client, PgError> {
     dotenv().ok();
     
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env");
@@ -13,6 +14,12 @@ pub fn connect_db() -> Result<Client, Error> {
 }
 
 // Note: not used yet, for use when building out scalable db arch
-pub async fn load_query(file_path: &str) -> Result<String, std::io::Error> {
-    fs::read_to_string(file_path).await
+pub fn load_query(file_path: &str) -> Result<String, IOError> {
+    match fs::read_to_string(file_path) {
+        Ok(q) => Ok(q),
+        Err(e) => {
+            error!("Failed to load SQL query: {}", e);
+            Err(e) // ✅ Return `std::io::Error`, not `Status`
+        }
+    }
 }
