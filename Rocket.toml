@@ -1,5 +1,2 @@
 [default.databases]
 projects-showcase = { url = "@DATABASE_URL" }
-
-[release]
-secret_key = "a-very-secure-random-key-change-this"
