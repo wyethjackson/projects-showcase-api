@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 5
+      timeout: 3s
+
+  app:
+    build: .
+    container_name: projects-showcase-api
+    restart: always
+    volumes:
+      - ./src/sql:/app/sql
+      - ./src/migrations:/app/migrations
+    depends_on:
+      db: 
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    command: ["sh", "-c", "sleep 5 && ./projects-showcase-api"]
+
+volumes:
+  postgres_data:

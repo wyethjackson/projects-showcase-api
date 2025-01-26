@@ -18,7 +18,7 @@ pub async fn index() -> Result<Json<Vec<Project>>, Status> {
             Status::InternalServerError
         })?;
 
-        let query = match load_query("src/sql/select-all-projects.sql") {
+        let query = match load_query("./sql/select-all-projects.sql") {
             Ok(q) => q,
             Err(e) => {
                 error!("Failed to load SQL query: {}", e);
