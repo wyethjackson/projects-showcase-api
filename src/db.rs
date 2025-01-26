@@ -17,7 +17,7 @@ pub enum DatabaseError {
 
 mod embedded {
     use refinery::embed_migrations;
-    embed_migrations!("./src/sql/migrations");
+    embed_migrations!("./src/migrations");
 }
 
 pub fn start_db() -> Result<Client, DatabaseError> {
