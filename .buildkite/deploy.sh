@@ -1,12 +1,18 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
 
-PROJECT_ID="projects-showcase-449019"
-IMAGE_NAME="projects-showcase-api"
-IMAGE_TAG="us-central1-docker.pkg.dev/projects-showcase-449019/projects-showcase-api-repo/projects-showcase-api:latest"
+set -euo pipefail
 
-echo "Updating Kubernetes deployment"
+if [ -z "${DOCKER_IMAGE:-}" ]; then
+  echo ":boom: \$DOCKER_IMAGE missing" 1>&2
+  exit 1
+fi
 
-kubectl set image deployment/rocket-app rocket-app=$IMAGE_TAG --record
+manifest="$(mktemp)"
 
-echo "Deployment updated in GKE"
+echo '--- :kubernetes: Shipping'
+
+envsubst < k8s.yml > "${manifest}"
+kubectl apply -f "${manifest}"
+
+echo '--- :zzz: Waiting for deployment'
+kubectl wait --for condition=available --timeout=300s -f "${manifest}"

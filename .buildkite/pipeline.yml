@@ -1,6 +1,21 @@
 steps:
-  - label: ":docker: Build and Push Image"
-    command: ".buildkite/build-and-push.sh"
+  - label: ":key: Authenticate with Google Cloud"
+    plugins:
+      - gcp-workload-identity-federation-buildkite-plugin#v1.4.0:
+          workload_identity_provider: "projects/${PROJECT_ID}/locations/global/workloadIdentityPools/buildkite-pool/providers/buildkite-provider"
+          service_account: "${SA_USERNAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+
+  - label: ":docker: Build & Push to GAR"
+    plugins:
+      - docker#v5.12.0:
+          image: "${IMAGE_TAG}"
+          always-pull: true
+          propagate-environment: true
+          workdir: "/app"
+          shell: ["/bin/sh", "-c"]
+          command: ["docker build -t $IMAGE_TAG . && docker push $IMAGE_TAG"]
 
   - label: ":kubernetes: Deploy to GKE"
     command: ".buildkite/deploy.sh"
+    agents:
+      queue: "kubernetes"

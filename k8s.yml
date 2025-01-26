@@ -1,31 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: projects-showcase-api
+  name: ${APP_NAME}
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: projects-showcase-api
+      app: ${APP_NAME}
   template:
     metadata:
       labels:
-        app: projects-showcase-api
+        app: ${APP_NAME}
     spec:
-      serviceAccountName: 800994016154-compute@developer.gserviceaccount.com
       containers:
-        - name: projects-showcase-api
-          image: us-east1-docker.pkg.dev/projects-showcase-449019/projects-showcase-api-repo/projects-showcase-api:latest
+        - name: ${APP_NAME}
+          image: ${GKE_ZONE}-docker.pkg.dev/${PROJECT_ID}/${GCR_REPO_NAME}/${APP_NAME}:latest
           ports:
             - containerPort: 8000
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: projects-showcase-api-service
+  name: ${APP_NAME}-service
 spec:
   selector:
-    app: projects-showcase-api
+    app: ${APP_NAME}
   ports:
     - protocol: TCP
       port: 80
