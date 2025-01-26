@@ -1,0 +1,6 @@
+steps:
+  - label: ":docker: Build and Push Image"
+    command: ".buildkite/build-and-push.sh"
+
+  - label: ":kubernetes: Deploy to GKE"
+    command: ".buildkite/deploy.sh"

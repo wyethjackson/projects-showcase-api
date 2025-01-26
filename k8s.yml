@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projects-showcase-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: projects-showcase-api
+  template:
+    metadata:
+      labels:
+        app: projects-showcase-api
+    spec:
+      serviceAccountName: 800994016154-compute@developer.gserviceaccount.com
+      containers:
+        - name: projects-showcase-api
+          image: us-east1-docker.pkg.dev/projects-showcase-449019/projects-showcase-api-repo/projects-showcase-api:latest
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: projects-showcase-api-service
+spec:
+  selector:
+    app: projects-showcase-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer
