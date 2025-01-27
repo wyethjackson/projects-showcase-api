@@ -4,6 +4,8 @@ steps:
       - gcp-workload-identity-federation-buildkite-plugin#v1.4.0:
           workload_identity_provider: "projects/${PROJECT_ID}/locations/global/workloadIdentityPools/buildkite-pool/providers/buildkite-provider"
           service_account: "${SA_USERNAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+    agents:
+      queue: "default"
 
   - label: ":docker: Build & Push to GAR"
     plugins:
@@ -14,6 +16,8 @@ steps:
           workdir: "/app"
           shell: ["/bin/sh", "-c"]
           command: ["docker build -t $IMAGE_TAG . && docker push $IMAGE_TAG"]
+    agents:
+      queue: "default"
 
   - label: ":kubernetes: Deploy to GKE"
     command: ".buildkite/deploy.sh"
