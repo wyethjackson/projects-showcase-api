@@ -1,2 +1,2 @@
 # projects-showcase-api
-API to showcase my projects
+API to showcase my projects 
