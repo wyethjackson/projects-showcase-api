@@ -22,4 +22,4 @@ steps:
   - label: ":kubernetes: Deploy to GKE"
     command: ".buildkite/deploy.sh"
     agents:
-      queue: "kubernetes"
+      queue: "default"
