@@ -1,7 +1,7 @@
 steps:
   - label: ":key: Authenticate with Google Cloud"
     plugins:
-      - gcp-workload-identity-federation-buildkite-plugin#v1.4.0:
+      - gcp-workload-identity-federation#v1.4.0:
           audience: "projects/${PROJECT_ID}/locations/global/workloadIdentityPools/buildkite-pool/providers/buildkite-provider"
           service-account: "${SA_USERNAME}@${PROJECT_ID}.iam.gserviceaccount.com"
     agents:
