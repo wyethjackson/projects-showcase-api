@@ -4,34 +4,34 @@ steps:
       echo "Credentials are located at \$GOOGLE_APPLICATION_CREDENTIALS or \$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE"
     plugins:
       - gcp-workload-identity-federation#v1.4.0:
-          audience: "//iam.googleapis.com/projects/${PROJECT_ID}/locations/global/workloadIdentityPools/buildkite-pool/providers/buildkite-provider"
-          service-account: "${SA_USERNAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+          audience: "//iam.googleapis.com/projects/${GCP_PROJECT_ID}/locations/global/workloadIdentityPools/buildkite-pool/providers/buildkite-provider"
+          service-account: "${SA_USERNAME}@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
       - docker#v5.12.0:
-          image: "${GKE_ZONE}-docker.pkg.dev/${PROJECT_ID}/${GCR_REPO_NAME}/${APP_NAME}:${BUILDKITE_COMMIT}"
+          image: "${GKE_ZONE}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCR_REPO_NAME}/${APP_NAME}:${BUILDKITE_COMMIT}"
           always-pull: true
           tags:
             - "${BUILDKITE_COMMIT}"
             - "latest"
           registry: "${GKE_ZONE}-docker.pkg.dev"
           login: true
-          expand-volume-vars: true
-          propagate-environment: true
-          workdir: "/app"
-          shell: ["/bin/sh", "-c"]
-          command: |
-            export IMAGE_TAG="us-east1-docker.pkg.dev/${PROJECT_ID}/${GCR_REPO_NAME}/projects-showcase-api:${BUILDKITE_COMMIT}"
-            export IMAGE_LATEST="us-east1-docker.pkg.dev/${PROJECT_ID}/${GCR_REPO_NAME}/projects-showcase-api:latest"
+          # expand-volume-vars: true
+          # propagate-environment: true
+          # workdir: "/app"
+          # shell: ["/bin/sh", "-c"]
+          # command: |
+          #   export IMAGE_TAG="us-east1-docker.pkg.dev/${GCP_PROJECT_ID}/${GCR_REPO_NAME}/projects-showcase-api:${BUILDKITE_COMMIT}"
+          #   export IMAGE_LATEST="us-east1-docker.pkg.dev/${GCP_PROJECT_ID}/${GCR_REPO_NAME}/projects-showcase-api:latest"
 
-            echo "🛠 Image tag being used: $IMAGE_TAG"
-            echo "🛠 Latest tag being used: $IMAGE_LATEST"
+          #   echo "🛠 Image tag being used: $IMAGE_TAG"
+          #   echo "🛠 Latest tag being used: $IMAGE_LATEST"
 
-            docker build -t $IMAGE_TAG -t $IMAGE_LATEST .
+          #   docker build -t $IMAGE_TAG -t $IMAGE_LATEST .
 
-            echo "🚀 Pushing Docker image with commit tag: $IMAGE_TAG"
-            docker push $IMAGE_TAG
+          #   echo "🚀 Pushing Docker image with commit tag: $IMAGE_TAG"
+          #   docker push $IMAGE_TAG
 
-            echo "🚀 Pushing Docker image with latest tag: $IMAGE_LATEST"
-            docker push $IMAGE_LATEST
+          #   echo "🚀 Pushing Docker image with latest tag: $IMAGE_LATEST"
+          #   docker push $IMAGE_LATEST
     agents:
       queue: "default"
   - label: ":kubernetes: Deploy to GKE"
