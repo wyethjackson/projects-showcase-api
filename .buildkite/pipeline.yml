@@ -14,11 +14,24 @@ steps:
             - "latest"
           registry: "${GKE_ZONE}-docker.pkg.dev"
           login: true
-          # expand-volume-vars: true
-          # propagate-environment: true
-          # workdir: "/app"
-          # shell: ["/bin/sh", "-c"]
-          # command: ["docker build -t $IMAGE_TAG . && docker push $IMAGE_TAG"]
+          expand-volume-vars: true
+          propagate-environment: true
+          workdir: "/app"
+          shell: ["/bin/sh", "-c"]
+          command: |
+            export IMAGE_TAG="us-east1-docker.pkg.dev/${PROJECT_ID}/${GCR_REPO_NAME}/projects-showcase-api:${BUILDKITE_COMMIT}"
+            export IMAGE_LATEST="us-east1-docker.pkg.dev/${PROJECT_ID}/${GCR_REPO_NAME}/projects-showcase-api:latest"
+
+            echo "🛠 Image tag being used: $IMAGE_TAG"
+            echo "🛠 Latest tag being used: $IMAGE_LATEST"
+
+            docker build -t $IMAGE_TAG -t $IMAGE_LATEST .
+
+            echo "🚀 Pushing Docker image with commit tag: $IMAGE_TAG"
+            docker push $IMAGE_TAG
+
+            echo "🚀 Pushing Docker image with latest tag: $IMAGE_LATEST"
+            docker push $IMAGE_LATEST
     agents:
       queue: "default"
   - label: ":kubernetes: Deploy to GKE"
